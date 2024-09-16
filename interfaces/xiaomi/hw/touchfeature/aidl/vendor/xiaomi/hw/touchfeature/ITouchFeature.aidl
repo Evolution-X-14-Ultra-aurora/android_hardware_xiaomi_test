@@ -19,13 +19,15 @@
 package vendor.xiaomi.hw.touchfeature;
 @VintfStability
 interface ITouchFeature {
-  int getModeCurValueString(int touchId, int mode);
-  int getModeValues(int touchId, int mode);
-  int getTouchModeCurValue(int touchId, int mode);
-  int getTouchModeDefValue(int touchId, int mode);
-  int getTouchModeMaxValue(int touchId, int mode);
-  int getTouchModeMinValue(int touchId, int mode);
-  boolean resetTouchMode(int touchId, int mode);
-  boolean setEdgeMode(int touchId, int mode, in int[] value, int length);
-  void setTouchMode(int touchId, int mode, int value);
+    int setModeValue(int touchId, int ControlMode, int ModeValue);
+    int getModeCurValue(int touchId, int ControlMode);
+    String getModeCurValueString(int touchId, int ControlMode);
+    int getModeMaxValue(int touchId, int ControlMode);
+    int getModeMinValue(int touchId, int ControlMode);
+    int getModeDefaultValue(int touchId, int ControlMode);
+    int modeReset(int touchId, int ControlMode);
+    int[] getModeValue(int touchId, int mode);
+    int setModeLongValue(int touchId, int ControlMode, int ValueLen, inout int[] ValueBuf);
+    String getModeWhiteList(int ValueLen, inout int[] ValueBuf);
+    String getTouchEvent();
 }
