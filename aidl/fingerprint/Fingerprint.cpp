@@ -9,7 +9,6 @@
 #include <android-base/logging.h>
 #include <cutils/properties.h>
 
-
 namespace {
 
 typedef struct fingerprint_hal {
@@ -61,7 +60,9 @@ Fingerprint::Fingerprint()
       mSupportsGestures(false),
       mDevice(nullptr),
       mUdfpsHandlerFactory(nullptr),
-      mUdfpsHandler(nullptr) {
+      mUdfpsHandler(nullptr),
+      mExtension(nullptr),
+      mTouchFeature(nullptr) {
     sInstance = this;  // keep track of the most recent instance
     for (auto& [class_name] : kModules) {
         mDevice = openHal(class_name);
@@ -88,6 +89,21 @@ Fingerprint::Fingerprint()
         }
     }
 #endif
+
+   mExtension = IXiaomiFingerprint::getDefaultImpl();
+        if (mExtension == nullptr) {
+            ALOGE("Fingerprint extension not available");
+            return;
+        } else {
+            ALOGI("Successfully bound fingerprint extension");
+    }
+    mTouchFeature = ITouchFeature::getDefaultImpl();
+        if (mTouchFeature == nullptr) {
+            ALOGE("TouchFeature not available");
+            return;
+        } else {
+            ALOGI("Successfully bound TouchFeature");
+    }
 
         break;
     }
@@ -131,6 +147,8 @@ fingerprint_device_t* Fingerprint::openHal(const char* class_name) {
 
     return fp_device;
 }
+
+
 
 Fingerprint::~Fingerprint() {
     ALOGV("~Fingerprint()");

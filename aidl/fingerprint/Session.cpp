@@ -11,6 +11,11 @@
 
 #include "CancellationSignal.h"
 
+#define CMD_FOD_LHBM_STATUS 4
+#define CMD_TOUCH_FOD_ENABLE 1001
+#define LOCAL_HBM_NORMAL_WHITE_1000NIT 1
+#define LOCAL_HBM_OFF_TO_NORMAL 0
+
 namespace aidl {
 namespace android {
 namespace hardware {
@@ -61,6 +66,7 @@ ndk::ScopedAStatus Session::revokeChallenge(int64_t challenge) {
 ndk::ScopedAStatus Session::enroll(const HardwareAuthToken& hat,
                                    std::shared_ptr<ICancellationSignal>* out) {
     ALOGI("enroll");
+    setFODPressEnabled(true);
 
     if (mUdfpsHandler) {
         mUdfpsHandler->enroll();
@@ -81,6 +87,7 @@ ndk::ScopedAStatus Session::enroll(const HardwareAuthToken& hat,
 ndk::ScopedAStatus Session::authenticate(int64_t operationId,
                                          std::shared_ptr<ICancellationSignal>* out) {
     ALOGI("authenticate");
+    setFODPressEnabled(true);
 
     int error = mDevice->authenticate(mDevice, operationId, mUserId);
     if (error) {
@@ -220,6 +227,7 @@ ndk::ScopedAStatus Session::setIgnoreDisplayTouches(bool /*shouldIgnore*/) {
 
 ndk::ScopedAStatus Session::cancel() {
     ALOGI("cancel");
+    setFODPressEnabled(true);
     if (mUdfpsHandler) {
         mUdfpsHandler->cancel();
     }
@@ -416,6 +424,15 @@ void Session::notify(const fingerprint_msg_t* msg) {
                 enrollments.clear();
             }
         } break;
+    }
+}
+
+void Session::setFODPressEnabled(bool enabled) {
+    if (enabled) {
+        mExtension->extCmd(CMD_FOD_LHBM_STATUS, LOCAL_HBM_NORMAL_WHITE_1000NIT, 0);
+    } else {
+        mExtension->extCmd(CMD_FOD_LHBM_STATUS, LOCAL_HBM_OFF_TO_NORMAL, 0);
+        mTouchFeature->setModeValue(0, CMD_TOUCH_FOD_ENABLE, 0, 0);
     }
 }
 

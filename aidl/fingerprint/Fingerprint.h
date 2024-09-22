@@ -46,6 +46,9 @@ private:
     fingerprint_device_t* mDevice;
     UdfpsHandlerFactory* mUdfpsHandlerFactory;
     UdfpsHandler* mUdfpsHandler;
+
+    std::shared_ptr<IXiaomiFingerprint> mExtension;
+    std::shared_ptr<ITouchFeature> mTouchFeature;
 };
 
 } // namespace fingerprint
