@@ -71,12 +71,6 @@ Fingerprint::Fingerprint()
         }
 
         ALOGI("Opened fingerprint HAL, class %s", class_name);
-        break;
-    }
-
-    if (!mDevice) {
-        ALOGE("Can't open any HAL module");
-    }
 
 #ifdef USES_UDFPS_SENSOR
     ALOGI("UNDER_DISPLAY_OPTICAL selected");
@@ -95,6 +89,12 @@ Fingerprint::Fingerprint()
     }
 #endif
 
+        break;
+    }
+
+    if (!mDevice) {
+        ALOGE("Can't open any HAL module");
+    }
 }
 
 fingerprint_device_t* Fingerprint::openHal(const char* class_name) {
