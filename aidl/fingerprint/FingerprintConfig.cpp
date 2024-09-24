@@ -76,7 +76,7 @@ static Config::Data configData[] = {
         {NGS(next_enrollment), &Config::parseString, ""},
         {NGS(authenticator_id), &Config::parseInt64, "0"},
         {NGS(challenge), &Config::parseInt64, ""},
-        {NGS(sensor_driver), &Config::parseString, "goodix"},
+        {NGS(sensor_driver), &Config::parseString, "goodix_fod"},
         {NGS(sensor_id), &Config::parseInt32, "0"},
         {NGS(sensor_location), &Config::parseString, ""},
         {NGS(sensor_strength), &Config::parseInt32, "2"},  // STRONG
