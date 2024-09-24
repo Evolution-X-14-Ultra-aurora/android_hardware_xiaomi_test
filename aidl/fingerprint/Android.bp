@@ -5,7 +5,7 @@ package {
     // all of the 'license_kinds' from "hardware_interfaces_license"
     // to get the below license kinds:
     //   SPDX-license-identifier-Apache-2.0
-    default_applicable_licenses: ["hardware_interfaces_license"],
+    default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
 cc_binary {
@@ -28,12 +28,13 @@ cc_binary {
     stl: "c++_static",
     shared_libs: [
         "libbinder_ndk",
+        "libhardware",
         "liblog",
     ],
     static_libs: [
         "libandroid.hardware.biometrics.fingerprint.Props",
         "libbase",
-        "android.hardware.biometrics.fingerprint-V5-ndk",
+        "android.hardware.biometrics.fingerprint-V4-ndk",
         "android.hardware.biometrics.common-V4-ndk",
         "android.hardware.biometrics.common.thread",
         "android.hardware.biometrics.common.util",
@@ -43,6 +44,16 @@ cc_binary {
     ],
     init_rc: [ "fingerprint-xiaomi.rc" ],
     vintf_fragments: [ "fingerprint-xiaomi.xml" ],
+
+    header_libs: ["xiaomiaidlfingerprint_headers"],
+}
+
+cc_library_headers {
+    name: "xiaomiaidlfingerprint_headers",
+    export_include_dirs: ["include"],
+    vendor: true,
+    header_libs: ["libhardware_headers"],
+    export_header_lib_headers: ["libhardware_headers"],
 }
 
 sysprop_library {
@@ -50,5 +61,11 @@ sysprop_library {
     srcs: ["fingerprint.sysprop"],
     property_owner: "Vendor",
     vendor: true,
+
+    // Add visibility to the hardware_interfaces_license
+    visibility: [
+        "//hardware/interfaces",               // Allows access to the interfaces
+        "//hardware/xiaomi/aidl/fingerprint",  // Explicitly allow this package access
+    ],
 }
 

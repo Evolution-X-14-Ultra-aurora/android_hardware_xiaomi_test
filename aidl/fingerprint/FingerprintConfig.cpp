@@ -76,7 +76,7 @@ static Config::Data configData[] = {
         {NGS(next_enrollment), &Config::parseString, ""},
         {NGS(authenticator_id), &Config::parseInt64, "0"},
         {NGS(challenge), &Config::parseInt64, ""},
-        {NGS(sensor_driver), &Config::parseString, "goodix"}
+        {NGS(sensor_driver), &Config::parseString, "goodix"},
         {NGS(sensor_id), &Config::parseInt32, "0"},
         {NGS(sensor_location), &Config::parseString, ""},
         {NGS(sensor_strength), &Config::parseInt32, "2"},  // STRONG
@@ -104,7 +104,7 @@ static Config::Data configData[] = {
 };
 
 Config::Data* FingerprintConfig::getConfigData(int* size) {
-    *size = sizeof(configData) / sizeof(configData[0]);
+    *size = static_cast<int>(sizeof(configData) / sizeof(Config::Data));  // Use Config::Data explicitly
     return configData;
 }
 

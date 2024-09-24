@@ -260,7 +260,7 @@ bool FingerprintEngine::onAuthenticateFingerDown(ISessionCallback* cb,
     auto isEnrolled = std::find(enrolls.begin(), enrolls.end(), id) != enrolls.end();
     if (id > 0 && isEnrolled) {
         cb->onAuthenticationSucceeded(id, {} /* hat */);
-        mLockoutTracker.reset();
+        mLockoutTracker.reset(true);
         return true;
     } else {
         LOG(ERROR) << "Fail: fingerprint not enrolled";
@@ -392,7 +392,7 @@ void FingerprintEngine::resetLockoutImpl(ISessionCallback* cb,
 void FingerprintEngine::clearLockout(ISessionCallback* cb) {
     Fingerprint::cfg().set<bool>("lockout", false);
     cb->onLockoutCleared();
-    mLockoutTracker.reset();
+    mLockoutTracker.reset(true);
 }
 
 ndk::ScopedAStatus FingerprintEngine::onPointerDownImpl(int32_t /*pointerId*/, int32_t /*x*/,

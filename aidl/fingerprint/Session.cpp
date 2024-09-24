@@ -18,6 +18,8 @@
 #include "Legacy2Aidl.h"
 
 #include <android-base/logging.h>
+#include <android/log.h>
+#include <log/log.h>
 
 #include "util/CancellationSignal.h"
 
@@ -136,7 +138,7 @@ ndk::ScopedAStatus Session::enroll(const keymaster::HardwareAuthToken& hat,
     std::promise<void> cancellationPromise;
     auto cancFuture = cancellationPromise.get_future();
 
-    mWorker->schedule(Callable::from([this, hat, cancFuture = std::move(cancFuture)] {
+    mWorker->schedule(Callable::from([this, hat, authToken, cancFuture = std::move(cancFuture)] {
         enterStateOrCrash(SessionState::ENROLLING);
         int error = mDevice->enroll(mDevice, &authToken, mUserId, 60);
         if (shouldCancel(cancFuture)) {
@@ -364,13 +366,13 @@ ndk::ScopedAStatus Session::setIgnoreDisplayTouches(bool /*shouldIgnore*/) {
 }
 
 bool Session::checkSensorLockout() {
-    LockoutMode lockoutMode = mLockoutTracker.getMode();
-    if (lockoutMode == LockoutMode::PERMANENT) {
+    LockoutTracker::LockoutMode lockoutMode = mLockoutTracker.getMode();
+    if (lockoutMode == LockoutTracker::LockoutMode::kPermanent) {
         ALOGE("Fail: lockout permanent");
         mCb->onLockoutPermanent();
         mIsLockoutTimerAborted = true;
         return true;
-    } else if (lockoutMode == LockoutMode::TIMED) {
+    } else if (lockoutMode == LockoutTracker::LockoutMode::kTimed) {
         int64_t timeLeft = mLockoutTracker.getLockoutTimeLeft();
         ALOGE("Fail: lockout timed: %ld", timeLeft);
         mCb->onLockoutTimed(timeLeft);

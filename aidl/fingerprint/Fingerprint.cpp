@@ -24,6 +24,9 @@
 #include <android-base/logging.h>
 #include <android-base/stringprintf.h>
 
+#include <log/log.h>
+#include <android/log.h>
+
 using namespace ::android::fingerprint::xiaomi;
 
 namespace aidl::android::hardware::biometrics::fingerprint {
@@ -45,16 +48,19 @@ constexpr char SW_VERSION[] = "vendor/version/revision";
 static Fingerprint* sInstance;
 
 Fingerprint::Fingerprint() :
+        mEngine(nullptr),
+        mWorker(MAX_WORKER_QUEUE_SIZE),
+        mSession(nullptr),
+        mSensorType(FingerprintSensorType::UNKNOWN),
         mDevice(nullptr),
         mUdfpsHandlerFactory(nullptr),
-        mUdfpsHandler(nullptr),
-        mWorker(MAX_WORKER_QUEUE_SIZE) {
+        mUdfpsHandler(nullptr) {
     sInstance = this;
     std::string sensorDriver = Fingerprint::cfg().get<std::string>("sensor_driver");
     if (sensorDriver == "") {
         sensorDriver = "goodix";
     }
-    mDevice = openHal(sensorDriver);
+    mDevice = openHal(sensorDriver.c_str());
     if (!mDevice) {
         LOG(ERROR) << "Can't open HAL module:" << sensorDriver;
     } else {
@@ -179,7 +185,7 @@ ndk::ScopedAStatus Fingerprint::createSession(int32_t sensorId, int32_t userId,
                                               std::shared_ptr<ISession>* out) {
     CHECK(mSession == nullptr || mSession->isClosed()) << "Open session already exists!";
 
-    mSession = SharedRefBase::make<Session>(sensorId, userId, cb, mEngine.get(), &mWorker);
+    mSession = SharedRefBase::make<Session>(mDevice, mUdfpsHandler, sensorId, userId, cb, mEngine.get(), &mWorker);
     *out = mSession;
 
     mSession->linkToDeath(cb->asBinder().get());
@@ -204,7 +210,7 @@ binder_status_t Fingerprint::dump(int fd, const char** /*args*/, uint32_t numArg
     }
     ::android::base::WriteStringToFd(mEngine->toString(), fd);
 
-    ::android::base::WriteStringToFd(Fingerprint::cfg().toString(), fd);
+    //::android::base::WriteStringToFd(Fingerprint::cfg().toString(), fd);
 
     fsync(fd);
     return STATUS_OK;

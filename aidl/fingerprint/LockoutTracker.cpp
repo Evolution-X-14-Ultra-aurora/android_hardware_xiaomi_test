@@ -23,8 +23,10 @@ using namespace ::android::fingerprint::xiaomi;
 
 namespace aidl::android::hardware::biometrics::fingerprint {
 
-void LockoutTracker::reset() {
-    mFailedCount = 0;
+void LockoutTracker::reset(bool clearAttemptCounter) {
+    if (clearAttemptCounter) {
+        mFailedCount = 0;
+    }
     mLockoutTimedStart = 0;
     mCurrentMode = LockoutMode::kNone;
 }
@@ -47,7 +49,7 @@ void LockoutTracker::addFailedAttempt() {
             }
         }
     } else {
-        reset();
+        reset(true);
     }
 }
 

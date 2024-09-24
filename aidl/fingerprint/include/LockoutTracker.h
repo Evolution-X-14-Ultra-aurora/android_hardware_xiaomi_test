@@ -29,7 +29,7 @@ class LockoutTracker {
 
     enum class LockoutMode : int8_t { kNone = 0, kTimed, kPermanent };
 
-    void reset();
+    void reset(bool clearAttemptCounter);
     LockoutMode getMode();
     void addFailedAttempt();
     int64_t getLockoutTimeLeft();

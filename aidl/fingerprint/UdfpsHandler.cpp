@@ -106,6 +106,19 @@ class XiaomiUdfpsHander : public UdfpsHandler {
         setFodStatus(FOD_STATUS_OFF);
     }
 
+    void preEnroll() {
+        LOG(DEBUG) << __func__;
+    }
+
+    void enroll() {
+        LOG(DEBUG) << __func__;
+    }
+
+    void postEnroll() {
+        LOG(DEBUG) << __func__;
+        setFodStatus(FOD_STATUS_OFF);
+    }
+
   private:
     fingerprint_device_t* mDevice;
 
